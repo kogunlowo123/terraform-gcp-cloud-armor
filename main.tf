@@ -110,7 +110,11 @@ resource "google_compute_security_policy" "this" {
 
       match {
         expr {
-          expression = local.waf_rule_expressions[rule.value.priority]
+          expression = length(rule.value.opt_out_rule_ids) > 0 ? (
+            "evaluatePreconfiguredWaf('${rule.value.rule_set}', {'sensitivity': ${rule.value.sensitivity_level}, 'opt_out_rule_ids': [${join(",", [for id in rule.value.opt_out_rule_ids : "'${id}'"])}]})"
+          ) : (
+            "evaluatePreconfiguredWaf('${rule.value.rule_set}', {'sensitivity': ${rule.value.sensitivity_level}})"
+          )
         }
       }
     }
@@ -118,7 +122,7 @@ resource "google_compute_security_policy" "this" {
 
   # Adaptive Protection
   dynamic "adaptive_protection_config" {
-    for_each = local.enable_adaptive_protection ? [1] : []
+    for_each = var.adaptive_protection_config.enabled ? [1] : []
     content {
       layer_7_ddos_defense_config {
         enable          = var.adaptive_protection_config.layer_7_ddos_defense_enable

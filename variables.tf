@@ -25,7 +25,7 @@ variable "description" {
 }
 
 variable "type" {
-  description = "The type of the security policy. CLOUD_ARMOR for external HTTP(S) LB, CLOUD_ARMOR_EDGE for CDN, CLOUD_ARMOR_NETWORK for network LB."
+  description = "The type of the security policy (CLOUD_ARMOR, CLOUD_ARMOR_EDGE, CLOUD_ARMOR_NETWORK)."
   type        = string
   default     = "CLOUD_ARMOR"
 
@@ -36,15 +36,10 @@ variable "type" {
 }
 
 variable "adaptive_protection_config" {
-  description = <<-EOT
-    Adaptive Protection configuration:
-    - enabled: Whether to enable Adaptive Protection.
-    - layer_7_ddos_defense_enable: Enable Layer 7 DDoS defense.
-    - layer_7_ddos_defense_rule_visibility: Visibility of auto-deployed rules (STANDARD or PREMIUM).
-  EOT
+  description = "Adaptive Protection configuration with DDoS defense settings."
   type = object({
-    enabled                          = optional(bool, false)
-    layer_7_ddos_defense_enable      = optional(bool, false)
+    enabled                             = optional(bool, false)
+    layer_7_ddos_defense_enable         = optional(bool, false)
     layer_7_ddos_defense_rule_visibility = optional(string, "STANDARD")
   })
   default = {
@@ -53,11 +48,7 @@ variable "adaptive_protection_config" {
 }
 
 variable "advanced_options_config" {
-  description = <<-EOT
-    Advanced options configuration:
-    - json_parsing: JSON parsing mode (DISABLED, STANDARD, STANDARD_WITH_GRAPHQL).
-    - log_level: Logging level (NORMAL, VERBOSE).
-  EOT
+  description = "Advanced options for JSON parsing and log level."
   type = object({
     json_parsing = optional(string, "DISABLED")
     log_level    = optional(string, "NORMAL")
@@ -66,10 +57,7 @@ variable "advanced_options_config" {
 }
 
 variable "recaptcha_options_config" {
-  description = <<-EOT
-    reCAPTCHA options:
-    - redirect_site_key: reCAPTCHA site key for redirect-based challenges.
-  EOT
+  description = "reCAPTCHA options with redirect site key."
   type = object({
     redirect_site_key = string
   })
@@ -77,7 +65,7 @@ variable "recaptcha_options_config" {
 }
 
 variable "default_rule_action" {
-  description = "Action for the default rule. Either 'allow' or 'deny(403)' or 'deny(404)' or 'deny(502)'."
+  description = "Action for the default rule (allow, deny(403), deny(404), deny(502))."
   type        = string
   default     = "allow"
 
@@ -88,27 +76,7 @@ variable "default_rule_action" {
 }
 
 variable "rules" {
-  description = <<-EOT
-    List of security policy rules. Each rule contains:
-    - action: allow, deny(403), deny(404), deny(502), redirect, throttle, rate_based_ban
-    - priority: Rule priority (lower number = higher priority). Range: 0-2147483646.
-    - description: Rule description.
-    - preview: If true, the rule is in preview/logging-only mode.
-    - match: Match configuration with:
-      - versioned_expr: SRC_IPS_V1 for IP-based matching.
-      - config: Configuration with src_ip_ranges list.
-      - expr: CEL expression for advanced matching.
-    - rate_limit_options: (Optional) Rate limiting configuration with:
-      - conform_action: Action when rate is not exceeded (allow).
-      - exceed_action: Action when rate is exceeded (deny(403), deny(404), deny(502), redirect).
-      - enforce_on_key: Key to rate limit on (ALL, IP, HTTP_HEADER, XFF_IP, HTTP_COOKIE, HTTP_PATH, SNI, REGION_CODE).
-      - enforce_on_key_name: Name of the key (for HTTP_HEADER or HTTP_COOKIE).
-      - rate_limit_threshold: count and interval_sec.
-      - ban_threshold: (Optional) count and interval_sec for banning.
-      - ban_duration_sec: Duration of ban in seconds.
-    - redirect_options: (Optional) Redirect configuration with type (EXTERNAL_302, GOOGLE_RECAPTCHA) and target.
-    - header_action: (Optional) Custom headers to add with request_headers_to_adds list.
-  EOT
+  description = "List of security policy rules with action, priority, match, and optional rate limiting."
   type = list(object({
     action      = string
     priority    = number
@@ -124,9 +92,9 @@ variable "rules" {
       }))
     })
     rate_limit_options = optional(object({
-      conform_action    = optional(string, "allow")
-      exceed_action     = optional(string, "deny(403)")
-      enforce_on_key    = optional(string, "IP")
+      conform_action      = optional(string, "allow")
+      exceed_action       = optional(string, "deny(403)")
+      enforce_on_key      = optional(string, "IP")
       enforce_on_key_name = optional(string)
       rate_limit_threshold = object({
         count        = number
@@ -160,16 +128,7 @@ variable "rules" {
 }
 
 variable "pre_configured_waf_rules" {
-  description = <<-EOT
-    List of pre-configured WAF rules to add. Each contains:
-    - action: allow, deny(403), deny(404), deny(502)
-    - priority: Rule priority.
-    - description: Rule description.
-    - preview: Preview mode.
-    - rule_set: The pre-configured WAF rule set (e.g., sqli-v33-stable, xss-v33-stable, lfi-v33-stable, rfi-v33-stable, rce-v33-stable, methodenforcement-v33-stable, scannerdetection-v33-stable, protocolattack-v33-stable, php-v33-stable, sessionfixation-v33-stable, java-v33-stable, nodejs-v33-stable, cve-canary).
-    - sensitivity_level: Sensitivity level (0-4). Lower = fewer false positives.
-    - opt_out_rule_ids: List of rule IDs to exclude from the rule set.
-  EOT
+  description = "List of pre-configured WAF rules with rule_set, sensitivity_level, and opt_out_rule_ids."
   type = list(object({
     action            = string
     priority          = number
