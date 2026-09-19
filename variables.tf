@@ -38,8 +38,8 @@ variable "type" {
 variable "adaptive_protection_config" {
   description = "Adaptive Protection configuration with DDoS defense settings."
   type = object({
-    enabled                             = optional(bool, false)
-    layer_7_ddos_defense_enable         = optional(bool, false)
+    enabled                              = optional(bool, false)
+    layer_7_ddos_defense_enable          = optional(bool, false)
     layer_7_ddos_defense_rule_visibility = optional(string, "STANDARD")
   })
   default = {

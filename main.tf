@@ -112,7 +112,7 @@ resource "google_compute_security_policy" "this" {
         expr {
           expression = length(rule.value.opt_out_rule_ids) > 0 ? (
             "evaluatePreconfiguredWaf('${rule.value.rule_set}', {'sensitivity': ${rule.value.sensitivity_level}, 'opt_out_rule_ids': [${join(",", [for id in rule.value.opt_out_rule_ids : "'${id}'"])}]})"
-          ) : (
+            ) : (
             "evaluatePreconfiguredWaf('${rule.value.rule_set}', {'sensitivity': ${rule.value.sensitivity_level}})"
           )
         }
